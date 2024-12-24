@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useSpring, animated } from "react-spring";
 
 const texts = [
-  "Welcome to our beautiful page!",
-  "Next, we will explore more features.",
-  "Thank you for visiting!",
+  "One hot summer day, a thirsty crow found a pitcher with a little water at the bottom. He tried to drink but couldn’t reach it.",
+  "The clever crow had an idea. He picked up small stones and dropped them into the pitcher one by one. Slowly, the water rose to the top.",
+  "Finally, the crow drank the cool water and flew away happily.",
+  "Moral: Where there’s a will, there’s a way!",
 ];
 
 export default function Home() {
@@ -163,16 +164,17 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundImage: "url('../bg.jpg')",
-    backgroundSize: "cover",
+    backgroundImage: "url('../2.jpg')",
+    backgroundSize: "contain",
     position: "relative",
   },
   textContainer: {
-    border: "5px dashed #FF69B4",
+    // border: "5px dashed #FF69B4",
+    border: "none",
     borderRadius: "20px",
     padding: "60px",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+    // backgroundColor: "rgba(255, 255, 255, 0.8)",
+    // boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
     width: "90%",
     maxWidth: "600px",
     textAlign: "center",
@@ -197,6 +199,7 @@ const styles = {
   },
   text: {
     fontSize: "28px",
-    color: "#FF1493",
+    color: "#000",
+    // color: "#FF1493",
   },
 };
