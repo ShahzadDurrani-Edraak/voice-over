@@ -73,7 +73,8 @@ export default function Home() {
   const speakText = (text) => {
     if (voices.length > 0) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.voice = voices[0]; // Use the first available voice
+      utterance.voice = voices[2]; // Use the first available voice
+      utterance.rate = 0.55;
       window.speechSynthesis.cancel(); // Stop any ongoing speech
 
       const words = text.split(" ");
