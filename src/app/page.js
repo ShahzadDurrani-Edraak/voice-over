@@ -1,101 +1,201 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSpring, animated } from "react-spring";
+
+const texts = [
+  "Welcome to our beautiful page!",
+  "Next, we will explore more features.",
+  "Thank you for visiting!",
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useSpring(() => ({ opacity: 0 }));
+  const [isClient, setIsClient] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [highlightedText, setHighlightedText] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  // Set client-side flag after component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Load voices only once when the component mounts
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      const voicesList = window.speechSynthesis.getVoices();
+      if (voicesList.length > 0) {
+        setVoices(voicesList); // Set initial voices
+      } else {
+        const onVoicesChanged = () => {
+          const updatedVoices = window.speechSynthesis.getVoices();
+          if (updatedVoices.length > 0) {
+            setVoices(updatedVoices);
+            window.speechSynthesis.onvoiceschanged = null; // Cleanup
+          }
+        };
+        window.speechSynthesis.onvoiceschanged = onVoicesChanged;
+      }
+    }
+  }, []); // Run only once on component mount
+
+  // Speak the current text with word highlighting
+  // const speakText = (text) => {
+  //   if (voices.length > 0) {
+  //     const utterance = new SpeechSynthesisUtterance(text);
+  //     utterance.voice = voices[0]; // Use the first available voice
+  //     window.speechSynthesis.cancel(); // Stop any ongoing speech
+
+  //     const words = text.split(" ");
+  //     utterance.onboundary = (event) => {
+  //       if (event.name === "word") {
+  //         const wordIndex = event.charIndex;
+  //         const highlighted = words
+  //           .map((word, i) =>
+  //             i === wordIndex ? `<span style="color: red">${word}</span>` : word
+  //           )
+  //           .join(" ");
+  //         setHighlightedText(highlighted);
+  //       }
+  //     };
+
+  //     utterance.onend = () => {
+  //       setHighlightedText("");
+  //     };
+
+  //     window.speechSynthesis.speak(utterance);
+  //   } else {
+  //     console.error("No voices available for speech synthesis."); // Log error if no voices
+  //   }
+  // };
+
+  const speakText = (text) => {
+    if (voices.length > 0) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = voices[0]; // Use the first available voice
+      window.speechSynthesis.cancel(); // Stop any ongoing speech
+
+      const words = text.split(" ");
+      utterance.onboundary = (event) => {
+        if (event.name === "word") {
+          const charIndex = event.charIndex;
+
+          // Find the index of the word being spoken
+          let cumulativeLength = 0;
+          const highlighted = words
+            .map((word) => {
+              const start = cumulativeLength;
+              const end = cumulativeLength + word.length;
+              cumulativeLength += word.length + 1; // Account for space between words
+
+              if (charIndex >= start && charIndex < end) {
+                return `<span style=" background-color:#ffff0073; padding: 0 5px; font-weight: bold;">${word}</span>`;
+              }
+              return word;
+            })
+            .join(" ");
+
+          setHighlightedText(highlighted);
+        }
+      };
+
+      utterance.onend = () => {
+        setHighlightedText(""); // Clear highlight after speech ends
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.error("No voices available for speech synthesis."); // Log error if no voices
+    }
+  };
+
+  // Update fade-in when the index changes
+  useEffect(() => {
+    if (isClient) {
+      setFade({ opacity: 1, reset: true });
+    }
+  }, [index, setFade, isClient]);
+
+  // Handle "Next Slide" button click
+  const handleNext = () => {
+    setFade({ opacity: 0 });
+    setTimeout(
+      () => setIndex((prevIndex) => (prevIndex + 1) % texts.length),
+      300
+    );
+  };
+
+  // Handle "Play" button click
+  const handlePlay = () => {
+    speakText(texts[index]);
+  };
+
+  if (!isClient) return null; // Avoid rendering until client-side
+
+  return (
+    <div style={styles.container}>
+      <animated.div style={{ ...fade, ...styles.textContainer }}>
+        <h1
+          style={styles.text}
+          dangerouslySetInnerHTML={{
+            __html: highlightedText || texts[index],
+          }}
+        ></h1>
+      </animated.div>
+      <div style={styles.buttonContainer}>
+        <button onClick={handlePlay} style={styles.button}>
+          Play
+        </button>
+        <button onClick={handleNext} style={styles.button}>
+          Next Slide
+        </button>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    backgroundImage: "url('../bg.jpg')",
+    backgroundSize: "cover",
+    position: "relative",
+  },
+  textContainer: {
+    border: "5px dashed #FF69B4",
+    borderRadius: "20px",
+    padding: "60px",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+    width: "90%",
+    maxWidth: "600px",
+    textAlign: "center",
+    fontFamily: "'Comic Sans MS', cursive, sans-serif",
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: "60px",
+    display: "flex",
+    gap: "20px",
+  },
+  button: {
+    padding: "15px 30px",
+    fontSize: "18px",
+    cursor: "pointer",
+    backgroundColor: "#FF4500",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "10px",
+    transition: "background-color 0.3s, transform 0.2s",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+  },
+  text: {
+    fontSize: "28px",
+    color: "#FF1493",
+  },
+};
