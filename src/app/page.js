@@ -74,7 +74,11 @@ export default function Home() {
   const speakText = (text) => {
     if (voices.length > 0) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.voice = voices[0]; // Use the first available voice
+      // Find the voice by name
+      const selectedVoice = voices.find(
+        (voice) => voice.name === "Microsoft David - English (United States)"
+      );
+      utterance.voice = selectedVoice || voices[0]; // Use the specified voice or fallback to the first available voice
       utterance.rate = 0.55;
       window.speechSynthesis.cancel(); // Stop any ongoing speech
 
